@@ -29,9 +29,9 @@ func isValidPathName(name string) error {
 		return fmt.Errorf("can't end with a slash")
 	}
 
-	if !rePathName.MatchString(name) {
-		return fmt.Errorf("can contain only alphanumeric characters, underscore, dot, tilde, minus or slash")
-	}
+	//if !rePathName.MatchString(name) {
+	//	return fmt.Errorf("can contain only alphanumeric characters, underscore, dot, tilde, minus or slash")
+	//}
 
 	return nil
 }

@@ -246,6 +246,7 @@ func (pm *pathManager) doFindPathConf(req defs.PathFindPathConfReq) {
 }
 
 func (pm *pathManager) doDescribe(req defs.PathDescribeReq) {
+	req.AccessRequest.Name = pm.getPathStr(req.AccessRequest)
 	pathConfName, pathConf, pathMatches, err := conf.FindPathConf(pm.pathConfs, req.AccessRequest.Name)
 	if err != nil {
 		req.Res <- defs.PathDescribeRes{Err: err}
@@ -268,6 +269,7 @@ func (pm *pathManager) doDescribe(req defs.PathDescribeReq) {
 }
 
 func (pm *pathManager) doAddReader(req defs.PathAddReaderReq) {
+	req.AccessRequest.Name = pm.getPathStr(req.AccessRequest)
 	pathConfName, pathConf, pathMatches, err := conf.FindPathConf(pm.pathConfs, req.AccessRequest.Name)
 	if err != nil {
 		req.Res <- defs.PathAddReaderRes{Err: err}
@@ -289,6 +291,20 @@ func (pm *pathManager) doAddReader(req defs.PathAddReaderReq) {
 	}
 
 	req.Res <- defs.PathAddReaderRes{Path: pm.paths[req.AccessRequest.Name]}
+}
+
+func (pm *pathManager) getPath(r defs.PathAccessRequest) defs.Path {
+	path := pm.getPathStr(r)
+	return pm.paths[path]
+}
+
+// fix regular rule can‘t distinguish query params and pathMatches can't carry query params
+func (pm *pathManager) getPathStr(r defs.PathAccessRequest) string {
+	path := r.Name
+	if r.Query != "" {
+		path += "?" + r.Query
+	}
+	return path
 }
 
 func (pm *pathManager) doAddPublisher(req defs.PathAddPublisherReq) {

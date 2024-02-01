@@ -574,4 +574,19 @@ paths:
 
   # Settings under path "all_others" are applied to all paths that
   # do not match another entry.
+  "~^RTSPproxy_(.+)$":
+    # If path name is a regular expression, $G1, G2, etc will be replaced
+    # with regular expression groups.
+    source: rtsp://admin:admin123@$G1
+    sourceOnDemand: yes
+  "~^proxy_(.+)$":
+    # If path name is a regular expression, $G1, G2, etc will be replaced
+    # with regular expression groups.
+    source: rtsp://admin:admin123@$G1
+    sourceOnDemand: yes
+  "~^Pproxy_(.+)$":
+    # If path name is a regular expression, $G1, G2, etc will be replaced
+    # with regular expression groups.
+    source: rtsp://admin:123456ab@$G1
+    sourceOnDemand: yes
   all_others:

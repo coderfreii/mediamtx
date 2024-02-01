@@ -2,3 +2,5 @@
 /binaries
 /coverage*.txt
 /apidocs/*.html
+
+.idea
