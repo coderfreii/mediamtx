@@ -518,6 +518,9 @@ const onPublish = () => {
 		if (videoId !== 'none') {
 			videoOpts = {
 				deviceId: videoId,
+				width: { ideal: videoForm.width.value },
+				height: { ideal: videoForm.height.value },
+				frameRate: { ideal: videoForm.framerate.value },
 			};
 		}
 
@@ -551,9 +554,9 @@ const onPublish = () => {
 	} else {
 		navigator.mediaDevices.getDisplayMedia({
 			video: {
-				width: { ideal: videoForm.width.value },
-				height: { ideal: videoForm.height.value },
-				frameRate: { ideal: videoForm.framerate.value },
+				width: videoForm.width.value,
+				height: videoForm.height.value,
+				frameRate: videoForm.framerate.value,
 				cursor: 'always',
 			},
 			audio: true,
@@ -562,6 +565,10 @@ const onPublish = () => {
 				stream = str;
 				video.srcObject = stream;
 				startTransmit();
+				const videoTrack = stream.getVideoTracks()[0];
+				const settings = videoTrack.getSettings();
+				const actualFrameRate = settings.frameRate;
+				console.log('实际帧率：', actualFrameRate);
 			})
 			.catch((err) => {
 				onError(err.toString(), false);
@@ -663,6 +670,38 @@ const populateOptions = () => {
 		})
 		.catch((err) => {
 			onError(err.toString(), false);
+			if (restartTimeout === null) {
+				setMessage(err + ', retrying in some seconds');
+
+				if (pc !== null) {
+					pc.close();
+					pc = null;
+				}
+
+				restartTimeout = window.setTimeout(() => {
+                    setMessage('start without device');
+					restartTimeout = null;
+                    Promise.all([
+                        populateDevices(),
+                        populateCodecs(),
+                    ])
+                        .then(() => {
+
+                            setMessage('');
+                            video.style.display = 'none';
+                            controls.style.display = 'flex';
+                        });
+				}, retryPause);
+
+				if (sessionUrl) {
+					fetch(sessionUrl, {
+						method: 'DELETE',
+					});
+				}
+				sessionUrl = '';
+
+				queuedCandidates = [];
+			}
 		});
 };
 
